@@ -1,0 +1,8 @@
+app:
+  seed-local-users: false
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+

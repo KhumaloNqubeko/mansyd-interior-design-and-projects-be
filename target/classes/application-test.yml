@@ -1,0 +1,6 @@
+app:
+  seed-local-users: false
+spring:
+  jpa:
+    show-sql: false
+

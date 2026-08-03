@@ -1,0 +1,6 @@
+com\carpenter\business\servicerequest\ServiceRequestControllerTest.class
+com\carpenter\business\auth\AuthenticationControllerTest.class
+com\carpenter\business\servicerequest\ServiceRequestServiceTest.class
+com\carpenter\business\customer\CustomerControllerTest.class
+com\carpenter\business\auth\AuthenticationServiceTest.class
+com\carpenter\business\integration\PostgresIntegrationTest.class

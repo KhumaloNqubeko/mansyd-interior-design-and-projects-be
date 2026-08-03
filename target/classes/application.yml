@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: carpenter-business-backend
+  profiles:
+    default: local
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/carpenter_business}
+    username: ${SPRING_DATASOURCE_USERNAME:carpenter}
+    password: ${SPRING_DATASOURCE_PASSWORD:change-me}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+app:
+  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:4200}
+  file-upload-directory: ${FILE_UPLOAD_DIRECTORY:./uploads}
+  seed-local-users: ${SEED_LOCAL_USERS:true}
+
