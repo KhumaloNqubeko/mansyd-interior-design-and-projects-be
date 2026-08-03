@@ -266,6 +266,69 @@ Verification after this remediation slice:
 
 Remaining production blockers still include the unimplemented appointment, quotation, order, project, inventory, supplier, invoice, payment, expense, notification, reporting, document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
 
+2026-08-03 10:42 +02:00: Implemented the quotation and order slice while preserving the separate backend/frontend folder layout. Backend additions include quotation/order entities, repositories, controllers, DTOs, server-side quotation calculation using `BigDecimal`, draft-only quotation editing, pending-only accept/reject rules, idempotent order creation, order status transitions, and `V3__create_quotations_and_orders.sql`. Frontend additions include quotation/order models and API services, carpenter quotation builder, customer quotation accept/reject screen, shared order list/status screen, and portal navigation.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS; 17 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include the unimplemented appointment, project, inventory, supplier, invoice, payment, expense, notification, reporting, document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
+2026-08-03 11:07 +02:00: Implemented the project management slice while preserving the separate backend/frontend folder layout. Backend additions include project/project-update entities, repositories, controller, DTOs, status transition rules, automatic project creation from accepted-order creation, progress/completion-date validation, project timeline updates, and `V4__create_projects.sql`. Frontend additions include project models and API service, customer/carpenter project route entries, project status/progress/date controls for the carpenter, and timeline viewing for both roles.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS; 20 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include the unimplemented appointment, inventory, supplier, invoice, payment, expense, notification, reporting, document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
+2026-08-03 11:20 +02:00: Implemented the invoice and payment slice while preserving the separate backend/frontend folder layout. Backend additions include invoice/payment entities, repositories, controllers, DTOs, invoice issue/cancel rules, customer payment submission with proof-reference metadata, carpenter approve/reject review flow, transactional invoice balance updates, overpayment prevention, and `V5__create_invoices_and_payments.sql`. Frontend additions include invoice/payment models and API services, role-aware billing routes, carpenter invoice creation/issue/payment-review actions, and customer invoice/payment submission UI.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS; 25 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include the unimplemented appointment, inventory, supplier, expense, notification, reporting, document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
+2026-08-03 11:48 +02:00: Implemented the supplier and inventory slice while preserving the separate backend/frontend folder layout. Backend additions include supplier/material/stock-transaction/project-material entities, repositories, controllers, DTOs, material code uniqueness, low-stock calculation, stock-in/adjustment/damage/allocation/return transaction rules, project material allocation tracking, negative-stock prevention, and `V6__create_suppliers_and_inventory.sql`. Frontend additions include inventory models and API service, carpenter inventory route, supplier/material creation forms, stock movement form, material low-stock display, and stock history list.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS; 27 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include the unimplemented appointment, expense, notification, reporting, document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
+2026-08-03 12:21 +02:00: Implemented the expense slice while preserving the separate backend/frontend folder layout. Backend additions include expense entity, category/status enums, repository, controller, DTOs, draft/approve/reimburse/void workflow rules, future-date approval prevention, optional supplier/project/material links, and `V7__create_expenses.sql`. Frontend additions include expense models and API service, carpenter expense route/navigation, expense capture/edit form, supplier/project/material selectors, and status actions for approval, reimbursement and voiding.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS; 30 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include the unimplemented appointment, notification, reporting, document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
+2026-08-03 12:29 +02:00: Implemented the reporting/dashboard slice while preserving the separate backend/frontend folder layout. Backend additions include read-only reporting DTOs, `ReportingService`, `ReportingController`, carpenter-only `/api/reports/overview`, financial totals, workflow status buckets, expense category buckets, inventory value calculation, and low-stock watchlist output. Frontend additions include reporting models and API service, carpenter reporting route/navigation, overview KPI cards, status/category rollups, inventory value display, and low-stock watchlist.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS; 31 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include the unimplemented appointment, notification, document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
+2026-08-03 13:45 +02:00: Implemented the appointment scheduling slice while preserving the separate backend/frontend folder layout. Backend additions include appointment entity, type/status enums, repository, controller, DTOs, carpenter-only scheduling/rescheduling/status workflow, customer-owned appointment listing, optional service-request/project links, relationship ownership validation, appointment time-window validation, and `V8__create_appointments.sql`. Frontend additions include appointment models and API service, shared role-aware appointment screen, carpenter scheduling/status controls, customer appointment list, and route/sidebar entries for `/carpenter/appointments` and `/customer/appointments`.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS after clearing a Windows/OneDrive lock on generated `target`; 34 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include the unimplemented notification, document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
 ### Evidence
 - Backend project metadata: `pom.xml` uses group `com.carpenter`, artifact `carpenter-business-backend`, Java 21 and Spring Boot 3.5.4.
 - Backend endpoints found: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/session` in `src/main/java/com/carpenter/business/auth/AuthenticationController.java`.

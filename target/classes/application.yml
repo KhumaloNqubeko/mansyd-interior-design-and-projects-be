@@ -5,8 +5,8 @@ spring:
     default: local
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/carpenter_business}
-    username: ${SPRING_DATASOURCE_USERNAME:carpenter}
-    password: ${SPRING_DATASOURCE_PASSWORD:change-me}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:Khumalo01}
   jpa:
     hibernate:
       ddl-auto: validate
