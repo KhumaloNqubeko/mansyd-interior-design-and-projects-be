@@ -3,11 +3,15 @@ package com.carpenter.business.appointment;
 import com.carpenter.business.appointment.dto.AppointmentRequest;
 import com.carpenter.business.appointment.dto.AppointmentResponse;
 import com.carpenter.business.appointment.dto.AppointmentStatusUpdateRequest;
+import com.carpenter.business.audit.AuditAction;
+import com.carpenter.business.audit.AuditLogService;
 import com.carpenter.business.common.PageResponse;
 import com.carpenter.business.customer.Customer;
 import com.carpenter.business.customer.CustomerRepository;
 import com.carpenter.business.exception.ResourceNotFoundException;
 import com.carpenter.business.exception.UnauthorisedOperationException;
+import com.carpenter.business.notification.NotificationService;
+import com.carpenter.business.notification.NotificationType;
 import com.carpenter.business.project.Project;
 import com.carpenter.business.project.ProjectRepository;
 import com.carpenter.business.security.CurrentUser;
@@ -42,15 +46,20 @@ public class AppointmentService {
     private final ServiceRequestRepository serviceRequestRepository;
     private final ProjectRepository projectRepository;
     private final CurrentUser currentUser;
+    private final NotificationService notificationService;
+    private final AuditLogService auditLogService;
 
     public AppointmentService(AppointmentRepository appointmentRepository, CustomerRepository customerRepository,
                               ServiceRequestRepository serviceRequestRepository, ProjectRepository projectRepository,
-                              CurrentUser currentUser) {
+                              CurrentUser currentUser, NotificationService notificationService,
+                              AuditLogService auditLogService) {
         this.appointmentRepository = appointmentRepository;
         this.customerRepository = customerRepository;
         this.serviceRequestRepository = serviceRequestRepository;
         this.projectRepository = projectRepository;
         this.currentUser = currentUser;
+        this.notificationService = notificationService;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
@@ -64,12 +73,16 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.save(new Appointment(customer, serviceRequest, project, user,
                 trim(request.title()), request.type(), request.scheduledStart(), request.scheduledEnd(),
                 trim(request.location()), clean(request.notes())));
+        auditLogService.record(user, AuditAction.CREATED, "Appointment", appointment.getId(),
+                "Scheduled appointment " + appointment.getTitle());
+        notificationService.notifyUser(customer.getUser(), NotificationType.APPOINTMENT, "Appointment scheduled",
+                appointment.getTitle() + " is scheduled for " + appointment.getScheduledStart(), "/customer/appointments");
         return AppointmentResponse.from(appointment);
     }
 
     @Transactional(readOnly = true)
     public PageResponse<AppointmentResponse> all(Authentication authentication, Pageable pageable) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
         return PageResponse.from(appointmentRepository.findAll(pageable).map(AppointmentResponse::from));
     }
 
@@ -87,7 +100,7 @@ public class AppointmentService {
 
     @Transactional
     public AppointmentResponse update(UUID id, AppointmentRequest request, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
         validateWindow(request);
         Appointment appointment = appointment(id);
         if (appointment.getStatus() != AppointmentStatus.SCHEDULED && appointment.getStatus() != AppointmentStatus.CONFIRMED) {
@@ -99,17 +112,26 @@ public class AppointmentService {
         validateRelationships(customer, serviceRequest, project);
         appointment.update(customer, serviceRequest, project, trim(request.title()), request.type(),
                 request.scheduledStart(), request.scheduledEnd(), trim(request.location()), clean(request.notes()));
+        auditLogService.record(user, AuditAction.UPDATED, "Appointment", appointment.getId(),
+                "Updated appointment " + appointment.getTitle());
+        notificationService.notifyUser(customer.getUser(), NotificationType.APPOINTMENT, "Appointment updated",
+                appointment.getTitle() + " was updated", "/customer/appointments");
         return AppointmentResponse.from(appointment);
     }
 
     @Transactional
     public AppointmentResponse updateStatus(UUID id, AppointmentStatusUpdateRequest request, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
         Appointment appointment = appointment(id);
         if (!ALLOWED_TRANSITIONS.getOrDefault(appointment.getStatus(), Set.of()).contains(request.status())) {
             throw new UnauthorisedOperationException("Invalid appointment status transition.");
         }
         appointment.changeStatus(request.status());
+        auditLogService.record(user, AuditAction.STATUS_CHANGED, "Appointment", appointment.getId(),
+                "Changed appointment status to " + appointment.getStatus());
+        notificationService.notifyUser(appointment.getCustomer().getUser(), NotificationType.APPOINTMENT,
+                "Appointment status updated", appointment.getTitle() + " is now " + appointment.getStatus(),
+                "/customer/appointments");
         return AppointmentResponse.from(appointment);
     }
 

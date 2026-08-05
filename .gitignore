@@ -1,4 +1,6 @@
 target/
+target/surefire-reports/
+target/failsafe-reports/
 .idea/
 *.iml
 

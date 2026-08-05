@@ -1,6 +1,8 @@
 package com.carpenter.business.quotation;
 
 import com.carpenter.business.common.PageResponse;
+import com.carpenter.business.audit.AuditAction;
+import com.carpenter.business.audit.AuditLogService;
 import com.carpenter.business.exception.DuplicateResourceException;
 import com.carpenter.business.exception.ResourceNotFoundException;
 import com.carpenter.business.exception.UnauthorisedOperationException;
@@ -10,6 +12,7 @@ import com.carpenter.business.order.OrderService;
 import com.carpenter.business.quotation.dto.QuotationItemRequest;
 import com.carpenter.business.quotation.dto.QuotationRequest;
 import com.carpenter.business.quotation.dto.QuotationResponse;
+import com.carpenter.business.quotation.dto.QuotationRejectRequest;
 import com.carpenter.business.quotation.dto.QuotationUpdateRequest;
 import com.carpenter.business.security.CurrentUser;
 import com.carpenter.business.servicerequest.ServiceRequest;
@@ -33,11 +36,13 @@ public class QuotationService {
     private final OrderService orderService;
     private final OrderRepository orderRepository;
     private final CurrentUser currentUser;
+    private final AuditLogService auditLogService;
 
     public QuotationService(QuotationRepository quotationRepository, QuotationItemRepository quotationItemRepository,
                             ServiceRequestRepository serviceRequestRepository,
                             QuotationCalculationService calculationService, OrderService orderService,
-                            OrderRepository orderRepository, CurrentUser currentUser) {
+                            OrderRepository orderRepository, CurrentUser currentUser,
+                            AuditLogService auditLogService) {
         this.quotationRepository = quotationRepository;
         this.quotationItemRepository = quotationItemRepository;
         this.serviceRequestRepository = serviceRequestRepository;
@@ -45,11 +50,12 @@ public class QuotationService {
         this.orderService = orderService;
         this.orderRepository = orderRepository;
         this.currentUser = currentUser;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
     public QuotationResponse create(QuotationRequest request, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
         if (quotationRepository.existsByServiceRequestId(request.serviceRequestId())) {
             throw new DuplicateResourceException("A quotation already exists for this service request.");
         }
@@ -61,6 +67,8 @@ public class QuotationService {
         Quotation quotation = quotationRepository.save(new Quotation(generateQuotationNumber(), serviceRequest,
                 request.expiryDate(), cleanNotes(request.notes())));
         serviceRequest.changeStatus(ServiceRequestStatus.QUOTATION_IN_PROGRESS);
+        auditLogService.record(user, AuditAction.CREATED, "Quotation", quotation.getId(),
+                "Created draft quotation " + quotation.getQuotationNumber() + ".");
         return response(quotation);
     }
 
@@ -85,54 +93,73 @@ public class QuotationService {
 
     @Transactional
     public QuotationResponse update(UUID id, QuotationUpdateRequest request, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
-        Quotation quotation = requireDraft(find(id));
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
+        Quotation quotation = requireEditable(find(id));
         quotation.update(request.expiryDate(), cleanNotes(request.notes()));
+        auditLogService.record(user, AuditAction.UPDATED, "Quotation", quotation.getId(),
+                "Updated quotation " + quotation.getQuotationNumber() + ".");
         return response(quotation);
     }
 
     @Transactional
+    public void delete(UUID id, Authentication authentication) {
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
+        Quotation quotation = requireDraft(find(id));
+        quotation.getServiceRequest().changeStatus(ServiceRequestStatus.UNDER_REVIEW);
+        quotationRepository.delete(quotation);
+        auditLogService.record(user, AuditAction.ARCHIVED, "Quotation", quotation.getId(),
+                "Deleted draft quotation " + quotation.getQuotationNumber() + ".");
+    }
+
+    @Transactional
     public QuotationResponse addItem(UUID quotationId, QuotationItemRequest request, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
-        Quotation quotation = requireDraft(find(quotationId));
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
+        Quotation quotation = requireEditable(find(quotationId));
         QuotationItem item = new QuotationItem(quotation, request.type(), trim(request.description()),
                 request.quantity(), calculationService.money(request.unitPrice()),
                 calculationService.money(request.discountAmount()), request.taxRate());
         quotation.addItem(item);
         calculationService.recalculate(quotation);
+        auditLogService.record(user, AuditAction.UPDATED, "Quotation", quotation.getId(),
+                "Added item to quotation " + quotation.getQuotationNumber() + ": " + item.getDescription() + ".");
         return response(quotation);
     }
 
     @Transactional
     public QuotationResponse updateItem(UUID quotationId, UUID itemId, QuotationItemRequest request,
                                         Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
-        Quotation quotation = requireDraft(find(quotationId));
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
+        Quotation quotation = requireEditable(find(quotationId));
         QuotationItem item = quotation.getItems().stream().filter(candidate -> candidate.getId().equals(itemId))
                 .findFirst().orElseThrow(() -> new ResourceNotFoundException("Quotation item was not found."));
         item.update(request.type(), trim(request.description()), request.quantity(),
                 calculationService.money(request.unitPrice()), calculationService.money(request.discountAmount()),
                 request.taxRate(), item.getLineTotal());
         calculationService.recalculate(quotation);
+        auditLogService.record(user, AuditAction.UPDATED, "Quotation", quotation.getId(),
+                "Updated item on quotation " + quotation.getQuotationNumber() + ": " + item.getDescription() + ".");
         return response(quotation);
     }
 
     @Transactional
     public QuotationResponse deleteItem(UUID quotationId, UUID itemId, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
-        Quotation quotation = requireDraft(find(quotationId));
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
+        Quotation quotation = requireEditable(find(quotationId));
         QuotationItem item = quotation.getItems().stream().filter(candidate -> candidate.getId().equals(itemId))
                 .findFirst().orElseThrow(() -> new ResourceNotFoundException("Quotation item was not found."));
+        String description = item.getDescription();
         quotation.removeItem(item);
         quotationItemRepository.delete(item);
         calculationService.recalculate(quotation);
+        auditLogService.record(user, AuditAction.UPDATED, "Quotation", quotation.getId(),
+                "Removed item from quotation " + quotation.getQuotationNumber() + ": " + description + ".");
         return response(quotation);
     }
 
     @Transactional
     public QuotationResponse submit(UUID id, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
-        Quotation quotation = requireDraft(find(id));
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
+        Quotation quotation = requireSubmittable(find(id));
         if (quotation.getItems().isEmpty()) {
             throw new UnauthorisedOperationException("A quotation must contain at least one item before submission.");
         }
@@ -142,12 +169,15 @@ public class QuotationService {
         calculationService.recalculate(quotation);
         quotation.changeStatus(QuotationStatus.PENDING_CUSTOMER);
         quotation.getServiceRequest().changeStatus(ServiceRequestStatus.QUOTED);
+        auditLogService.record(user, AuditAction.SUBMITTED, "Quotation", quotation.getId(),
+                "Submitted quotation " + quotation.getQuotationNumber() + " to customer.");
         return response(quotation);
     }
 
     @Transactional
     public QuotationResponse accept(UUID id, Authentication authentication) {
-        Quotation quotation = findCustomerQuotation(id, authentication);
+        User user = currentUser.requireRole(authentication, Role.CUSTOMER);
+        Quotation quotation = findCustomerQuotation(id, user);
         if (quotation.getStatus() == QuotationStatus.ACCEPTED) {
             return response(quotation);
         }
@@ -160,16 +190,22 @@ public class QuotationService {
         }
         quotation.changeStatus(QuotationStatus.ACCEPTED);
         Order order = orderService.getOrCreateForQuotation(quotation);
+        auditLogService.record(user, AuditAction.APPROVED, "Quotation", quotation.getId(),
+                "Accepted quotation " + quotation.getQuotationNumber() + ".");
         return QuotationResponse.from(quotation, order.getId());
     }
 
     @Transactional
-    public QuotationResponse reject(UUID id, Authentication authentication) {
-        Quotation quotation = findCustomerQuotation(id, authentication);
+    public QuotationResponse reject(UUID id, QuotationRejectRequest request, Authentication authentication) {
+        User user = currentUser.requireRole(authentication, Role.CUSTOMER);
+        Quotation quotation = findCustomerQuotation(id, user);
         if (quotation.getStatus() != QuotationStatus.PENDING_CUSTOMER) {
             throw new UnauthorisedOperationException("Only pending quotations can be rejected.");
         }
-        quotation.changeStatus(QuotationStatus.REJECTED);
+        String rejectionNotes = cleanNotes(request == null ? null : request.rejectionNotes());
+        quotation.reject(rejectionNotes);
+        auditLogService.record(user, AuditAction.REJECTED, "Quotation", quotation.getId(),
+                "Rejected quotation " + quotation.getQuotationNumber() + rejectionSummary(rejectionNotes));
         return response(quotation);
     }
 
@@ -178,8 +214,7 @@ public class QuotationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Quotation was not found."));
     }
 
-    private Quotation findCustomerQuotation(UUID id, Authentication authentication) {
-        User user = currentUser.requireRole(authentication, Role.CUSTOMER);
+    private Quotation findCustomerQuotation(UUID id, User user) {
         return quotationRepository.findByIdAndCustomerUserId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Quotation was not found."));
     }
@@ -198,6 +233,20 @@ public class QuotationService {
         return quotation;
     }
 
+    private Quotation requireEditable(Quotation quotation) {
+        if (quotation.getStatus() != QuotationStatus.DRAFT && quotation.getStatus() != QuotationStatus.REJECTED) {
+            throw new UnauthorisedOperationException("Only draft or rejected quotations can be edited.");
+        }
+        return quotation;
+    }
+
+    private Quotation requireSubmittable(Quotation quotation) {
+        if (quotation.getStatus() != QuotationStatus.DRAFT && quotation.getStatus() != QuotationStatus.REJECTED) {
+            throw new UnauthorisedOperationException("Only draft or rejected quotations can be submitted.");
+        }
+        return quotation;
+    }
+
     private QuotationResponse response(Quotation quotation) {
         return QuotationResponse.from(quotation, orderRepository.findByQuotationId(quotation.getId()).map(Order::getId).orElse(null));
     }
@@ -208,4 +257,7 @@ public class QuotationService {
 
     private String cleanNotes(String notes) { return notes == null ? "" : notes.trim(); }
     private String trim(String value) { return value.trim(); }
+    private String rejectionSummary(String rejectionNotes) {
+        return rejectionNotes.isBlank() ? "." : ": " + rejectionNotes;
+    }
 }

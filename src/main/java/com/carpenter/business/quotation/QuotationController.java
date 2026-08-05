@@ -4,6 +4,7 @@ import com.carpenter.business.common.PageResponse;
 import com.carpenter.business.quotation.dto.QuotationItemRequest;
 import com.carpenter.business.quotation.dto.QuotationRequest;
 import com.carpenter.business.quotation.dto.QuotationResponse;
+import com.carpenter.business.quotation.dto.QuotationRejectRequest;
 import com.carpenter.business.quotation.dto.QuotationUpdateRequest;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -59,6 +60,12 @@ public class QuotationController {
         return quotationService.update(id, request, authentication);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void delete(@PathVariable UUID id, Authentication authentication) {
+        quotationService.delete(id, authentication);
+    }
+
     @PostMapping("/{id}/items")
     QuotationResponse addItem(@PathVariable UUID id, @Valid @RequestBody QuotationItemRequest request,
                               Authentication authentication) {
@@ -87,7 +94,8 @@ public class QuotationController {
     }
 
     @PatchMapping("/{id}/reject")
-    QuotationResponse reject(@PathVariable UUID id, Authentication authentication) {
-        return quotationService.reject(id, authentication);
+    QuotationResponse reject(@PathVariable UUID id, @Valid @RequestBody QuotationRejectRequest request,
+                             Authentication authentication) {
+        return quotationService.reject(id, request, authentication);
     }
 }

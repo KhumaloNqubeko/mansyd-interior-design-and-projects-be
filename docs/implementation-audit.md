@@ -329,6 +329,33 @@ Verification after this remediation slice:
 
 Remaining production blockers still include the unimplemented notification, document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
 
+2026-08-03 13:58 +02:00: Implemented the in-app notification slice while preserving the separate backend/frontend folder layout. Backend additions include notification entity, type enum, repository, controller, DTOs, unread count/read-state APIs, `V9__create_notifications.sql`, role/user notification helpers, and event emission from service requests, appointments, invoice issuing and payment review workflows. Frontend additions include notification models and API service, shared inbox screen, unread count display, mark-read/open actions, route/sidebar entries for `/carpenter/notifications` and `/customer/notifications`, and unread card styling.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS after clearing a Windows/OneDrive lock on generated `target`; 36 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include the unimplemented document and audit modules; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
+2026-08-03 14:08 +02:00: Implemented the document reference-management slice while preserving the separate backend/frontend folder layout. Backend additions include document entity, type/status enums, repository, controller, DTOs, customer-visible filtering, archive workflow, optional service-request/project/invoice links, relationship ownership validation, `V10__create_documents.sql`, and notification emission when a visible document is shared. Frontend additions include document models and API service, shared role-aware document screen, carpenter document form/edit/archive actions, customer document list, external open links, and route/sidebar entries for `/carpenter/documents` and `/customer/documents`.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS after clearing a Windows/OneDrive lock on generated `target`; 39 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include the unimplemented audit module; missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
+2026-08-03 14:27 +02:00: Implemented the audit log slice while preserving the separate backend/frontend folder layout. Backend additions include audit log entity, action enum, repository, controller, DTO, carpenter-only listing/filtering by entity, `V11__create_audit_logs.sql`, unit coverage, and workflow audit emission from service requests, appointments, invoices, payments and documents. Frontend additions include audit models and API service, carpenter audit-log route/sidebar entry, and a filterable `/carpenter/audit-logs` activity list.
+
+Verification after this remediation slice:
+- Backend `mvn clean verify`: PASS after clearing a Windows/OneDrive lock on generated `target`; 41 tests run, 0 failures, 1 PostgreSQL/Testcontainers test skipped because Docker was unavailable.
+- Frontend `npm test -- --watch=false`: PASS; 8 tests run, 0 failures.
+- Frontend `npm run build`: PASS.
+
+Remaining production blockers still include missing Docker Compose; broken Maven wrapper; skipped PostgreSQL integration verification; missing environment/root documentation; and unresolved frontend dependency audit findings.
+
 ### Evidence
 - Backend project metadata: `pom.xml` uses group `com.carpenter`, artifact `carpenter-business-backend`, Java 21 and Spring Boot 3.5.4.
 - Backend endpoints found: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/session` in `src/main/java/com/carpenter/business/auth/AuthenticationController.java`.

@@ -3,9 +3,11 @@ package com.carpenter.business.invoice;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import com.carpenter.business.audit.AuditLogService;
 import com.carpenter.business.customer.Customer;
 import com.carpenter.business.exception.UnauthorisedOperationException;
 import com.carpenter.business.invoice.dto.InvoiceUpdateRequest;
+import com.carpenter.business.notification.NotificationService;
 import com.carpenter.business.order.Order;
 import com.carpenter.business.order.OrderRepository;
 import com.carpenter.business.quotation.Quotation;
@@ -31,12 +33,14 @@ class InvoiceServiceTest {
     @Mock InvoiceRepository invoices;
     @Mock OrderRepository orders;
     @Mock CurrentUser currentUser;
+    @Mock NotificationService notificationService;
+    @Mock AuditLogService auditLogService;
     @Mock Authentication authentication;
     private InvoiceService service;
 
     @BeforeEach
     void setUp() {
-        service = new InvoiceService(invoices, orders, currentUser);
+        service = new InvoiceService(invoices, orders, currentUser, notificationService, auditLogService);
     }
 
     @Test

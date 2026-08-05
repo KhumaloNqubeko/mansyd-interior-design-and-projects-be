@@ -54,14 +54,29 @@ class ProjectServiceTest {
     }
 
     @Test
-    void completedProjectRequiresHundredPercentProgress() {
+    void projectCannotSkipInvalidStatusTransitions() {
         Project project = project();
+        project.changeStatus(ProjectStatus.SCHEDULED, 10, null, null);
         when(currentUser.requireRole(authentication, Role.CARPENTER)).thenReturn(user(Role.CARPENTER));
         when(projects.findById(project.getId())).thenReturn(Optional.of(project));
 
         assertThatThrownBy(() -> service.updateStatus(project.getId(),
-                new ProjectStatusUpdateRequest(ProjectStatus.COMPLETED, 90, LocalDate.now()), authentication))
+                new ProjectStatusUpdateRequest(ProjectStatus.COMPLETED), authentication))
                 .isInstanceOf(UnauthorisedOperationException.class);
+    }
+
+    @Test
+    void statusDeterminesProgressAndCapturesActualStartDate() {
+        Project project = project();
+        project.changeStatus(ProjectStatus.SCHEDULED, 10, null, null);
+        when(currentUser.requireRole(authentication, Role.CARPENTER)).thenReturn(user(Role.CARPENTER));
+        when(projects.findById(project.getId())).thenReturn(Optional.of(project));
+
+        var response = service.updateStatus(project.getId(), new ProjectStatusUpdateRequest(ProjectStatus.IN_PROGRESS), authentication);
+
+        assertThat(response.status()).isEqualTo(ProjectStatus.IN_PROGRESS);
+        assertThat(response.progress()).isEqualTo(25);
+        assertThat(response.actualStartDate()).isEqualTo(LocalDate.now());
     }
 
     @Test

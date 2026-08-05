@@ -28,14 +28,14 @@ public class ProjectService {
     private static final EnumMap<ProjectStatus, Set<ProjectStatus>> ALLOWED_TRANSITIONS = new EnumMap<>(ProjectStatus.class);
 
     static {
-        ALLOWED_TRANSITIONS.put(ProjectStatus.CREATED, EnumSet.of(ProjectStatus.SCHEDULED, ProjectStatus.IN_PROGRESS, ProjectStatus.CANCELLED));
-        ALLOWED_TRANSITIONS.put(ProjectStatus.SCHEDULED, EnumSet.of(ProjectStatus.IN_PROGRESS, ProjectStatus.ON_HOLD, ProjectStatus.CANCELLED));
+        ALLOWED_TRANSITIONS.put(ProjectStatus.CREATED, EnumSet.of(ProjectStatus.SCHEDULED, ProjectStatus.CANCELLED));
+        ALLOWED_TRANSITIONS.put(ProjectStatus.SCHEDULED, EnumSet.of(ProjectStatus.IN_PROGRESS, ProjectStatus.CANCELLED));
         ALLOWED_TRANSITIONS.put(ProjectStatus.IN_PROGRESS, EnumSet.of(ProjectStatus.AWAITING_MATERIALS, ProjectStatus.ON_HOLD, ProjectStatus.QUALITY_INSPECTION, ProjectStatus.CANCELLED));
         ALLOWED_TRANSITIONS.put(ProjectStatus.AWAITING_MATERIALS, EnumSet.of(ProjectStatus.IN_PROGRESS, ProjectStatus.ON_HOLD, ProjectStatus.CANCELLED));
         ALLOWED_TRANSITIONS.put(ProjectStatus.ON_HOLD, EnumSet.of(ProjectStatus.IN_PROGRESS, ProjectStatus.CANCELLED));
         ALLOWED_TRANSITIONS.put(ProjectStatus.QUALITY_INSPECTION, EnumSet.of(ProjectStatus.READY_FOR_DELIVERY, ProjectStatus.IN_PROGRESS));
-        ALLOWED_TRANSITIONS.put(ProjectStatus.READY_FOR_DELIVERY, EnumSet.of(ProjectStatus.DELIVERED, ProjectStatus.INSTALLED));
-        ALLOWED_TRANSITIONS.put(ProjectStatus.DELIVERED, EnumSet.of(ProjectStatus.INSTALLED, ProjectStatus.COMPLETED));
+        ALLOWED_TRANSITIONS.put(ProjectStatus.READY_FOR_DELIVERY, EnumSet.of(ProjectStatus.DELIVERED));
+        ALLOWED_TRANSITIONS.put(ProjectStatus.DELIVERED, EnumSet.of(ProjectStatus.INSTALLED));
         ALLOWED_TRANSITIONS.put(ProjectStatus.INSTALLED, EnumSet.of(ProjectStatus.COMPLETED));
         ALLOWED_TRANSITIONS.put(ProjectStatus.COMPLETED, EnumSet.noneOf(ProjectStatus.class));
         ALLOWED_TRANSITIONS.put(ProjectStatus.CANCELLED, EnumSet.noneOf(ProjectStatus.class));
@@ -92,8 +92,10 @@ public class ProjectService {
         currentUser.requireRole(authentication, Role.CARPENTER);
         Project project = find(id);
         validateStatusChange(project, request);
-        project.changeStatus(request.status(), request.status() == ProjectStatus.COMPLETED ? 100 : request.progress(),
-                request.status() == ProjectStatus.COMPLETED ? requireCompletionDate(request.actualCompletionDate()) : request.actualCompletionDate());
+        LocalDate today = LocalDate.now();
+        ProjectStatus nextStatus = request.status();
+        project.changeStatus(nextStatus, progressFor(nextStatus), actualStartDateFor(project, nextStatus, today),
+                nextStatus == ProjectStatus.COMPLETED ? today : project.getActualCompletionDate());
         return ProjectResponse.from(project);
     }
 
@@ -127,22 +129,38 @@ public class ProjectService {
     }
 
     private void validateStatusChange(Project project, ProjectStatusUpdateRequest request) {
+        if (project.getStatus() == request.status()) {
+            return;
+        }
         if (!ALLOWED_TRANSITIONS.getOrDefault(project.getStatus(), Set.of()).contains(request.status())) {
             throw new UnauthorisedOperationException("Invalid project status transition.");
         }
-        if (request.status() == ProjectStatus.COMPLETED && request.progress() != 100) {
-            throw new UnauthorisedOperationException("Completed projects must have 100 percent progress.");
-        }
-        if (request.actualCompletionDate() != null && request.actualCompletionDate().isAfter(LocalDate.now())) {
-            throw new UnauthorisedOperationException("Actual completion date cannot be in the future.");
-        }
     }
 
-    private LocalDate requireCompletionDate(LocalDate actualCompletionDate) {
-        if (actualCompletionDate == null) {
-            throw new UnauthorisedOperationException("Completed projects require an actual completion date.");
+    private int progressFor(ProjectStatus status) {
+        return switch (status) {
+            case CREATED -> 0;
+            case SCHEDULED -> 10;
+            case IN_PROGRESS -> 25;
+            case AWAITING_MATERIALS, ON_HOLD -> 35;
+            case QUALITY_INSPECTION -> 70;
+            case READY_FOR_DELIVERY -> 80;
+            case DELIVERED -> 90;
+            case INSTALLED -> 95;
+            case COMPLETED -> 100;
+            case CANCELLED -> 0;
+        };
+    }
+
+    private LocalDate actualStartDateFor(Project project, ProjectStatus status, LocalDate today) {
+        if (project.getActualStartDate() != null) {
+            return project.getActualStartDate();
         }
-        return actualCompletionDate;
+        return switch (status) {
+            case IN_PROGRESS, AWAITING_MATERIALS, ON_HOLD, QUALITY_INSPECTION, READY_FOR_DELIVERY, DELIVERED,
+                    INSTALLED, COMPLETED -> today;
+            default -> null;
+        };
     }
 
     private void validatePlannedDates(LocalDate start, LocalDate completion) {

@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import com.carpenter.business.audit.AuditLogService;
 import com.carpenter.business.customer.Customer;
 import com.carpenter.business.exception.UnauthorisedOperationException;
 import com.carpenter.business.invoice.Invoice;
 import com.carpenter.business.invoice.InvoiceService;
+import com.carpenter.business.notification.NotificationService;
 import com.carpenter.business.order.Order;
 import com.carpenter.business.payment.dto.PaymentDecisionRequest;
 import com.carpenter.business.payment.dto.PaymentRequest;
@@ -34,12 +36,14 @@ class PaymentServiceTest {
     @Mock PaymentRepository payments;
     @Mock InvoiceService invoices;
     @Mock CurrentUser currentUser;
+    @Mock NotificationService notificationService;
+    @Mock AuditLogService auditLogService;
     @Mock Authentication authentication;
     private PaymentService service;
 
     @BeforeEach
     void setUp() {
-        service = new PaymentService(payments, invoices, currentUser);
+        service = new PaymentService(payments, invoices, currentUser, notificationService, auditLogService);
     }
 
     @Test

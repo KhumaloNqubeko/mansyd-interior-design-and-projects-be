@@ -1,12 +1,16 @@
 package com.carpenter.business.invoice;
 
 import com.carpenter.business.common.PageResponse;
+import com.carpenter.business.audit.AuditAction;
+import com.carpenter.business.audit.AuditLogService;
 import com.carpenter.business.exception.DuplicateResourceException;
 import com.carpenter.business.exception.ResourceNotFoundException;
 import com.carpenter.business.exception.UnauthorisedOperationException;
 import com.carpenter.business.invoice.dto.InvoiceRequest;
 import com.carpenter.business.invoice.dto.InvoiceResponse;
 import com.carpenter.business.invoice.dto.InvoiceUpdateRequest;
+import com.carpenter.business.notification.NotificationService;
+import com.carpenter.business.notification.NotificationType;
 import com.carpenter.business.order.Order;
 import com.carpenter.business.order.OrderRepository;
 import com.carpenter.business.security.CurrentUser;
@@ -26,16 +30,21 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final OrderRepository orderRepository;
     private final CurrentUser currentUser;
+    private final NotificationService notificationService;
+    private final AuditLogService auditLogService;
 
-    public InvoiceService(InvoiceRepository invoiceRepository, OrderRepository orderRepository, CurrentUser currentUser) {
+    public InvoiceService(InvoiceRepository invoiceRepository, OrderRepository orderRepository, CurrentUser currentUser,
+                          NotificationService notificationService, AuditLogService auditLogService) {
         this.invoiceRepository = invoiceRepository;
         this.orderRepository = orderRepository;
         this.currentUser = currentUser;
+        this.notificationService = notificationService;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
     public InvoiceResponse create(InvoiceRequest request, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
         if (invoiceRepository.existsByOrderId(request.orderId())) {
             throw new DuplicateResourceException("An invoice already exists for this order.");
         }
@@ -43,6 +52,8 @@ public class InvoiceService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order was not found."));
         Invoice invoice = invoiceRepository.save(new Invoice(generateInvoiceNumber(), order, request.dueDate(),
                 money(request.totalAmount()), clean(request.notes())));
+        auditLogService.record(user, AuditAction.CREATED, "Invoice", invoice.getId(),
+                "Created invoice " + invoice.getInvoiceNumber());
         return InvoiceResponse.from(invoice);
     }
 
@@ -77,9 +88,13 @@ public class InvoiceService {
 
     @Transactional
     public InvoiceResponse issue(UUID id, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
         Invoice invoice = requireDraft(find(id));
         invoice.issue(LocalDate.now());
+        auditLogService.record(user, AuditAction.ISSUED, "Invoice", invoice.getId(),
+                "Issued invoice " + invoice.getInvoiceNumber());
+        notificationService.notifyUser(invoice.getCustomer().getUser(), NotificationType.INVOICE, "Invoice issued",
+                invoice.getInvoiceNumber() + " is ready for payment.", "/customer/billing");
         return InvoiceResponse.from(invoice);
     }
 

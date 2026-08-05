@@ -1,10 +1,14 @@
 package com.carpenter.business.payment;
 
 import com.carpenter.business.common.PageResponse;
+import com.carpenter.business.audit.AuditAction;
+import com.carpenter.business.audit.AuditLogService;
 import com.carpenter.business.exception.ResourceNotFoundException;
 import com.carpenter.business.exception.UnauthorisedOperationException;
 import com.carpenter.business.invoice.Invoice;
 import com.carpenter.business.invoice.InvoiceService;
+import com.carpenter.business.notification.NotificationService;
+import com.carpenter.business.notification.NotificationType;
 import com.carpenter.business.payment.dto.PaymentDecisionRequest;
 import com.carpenter.business.payment.dto.PaymentRequest;
 import com.carpenter.business.payment.dto.PaymentResponse;
@@ -24,11 +28,16 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final InvoiceService invoiceService;
     private final CurrentUser currentUser;
+    private final NotificationService notificationService;
+    private final AuditLogService auditLogService;
 
-    public PaymentService(PaymentRepository paymentRepository, InvoiceService invoiceService, CurrentUser currentUser) {
+    public PaymentService(PaymentRepository paymentRepository, InvoiceService invoiceService, CurrentUser currentUser,
+                          NotificationService notificationService, AuditLogService auditLogService) {
         this.paymentRepository = paymentRepository;
         this.invoiceService = invoiceService;
         this.currentUser = currentUser;
+        this.notificationService = notificationService;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
@@ -41,6 +50,10 @@ public class PaymentService {
         }
         Payment payment = paymentRepository.save(new Payment(invoice, amount, request.paymentDate(),
                 trim(request.proofReference()), clean(request.notes())));
+        auditLogService.record(user, AuditAction.SUBMITTED, "Payment", payment.getId(),
+                "Submitted payment for " + invoice.getInvoiceNumber());
+        notificationService.notifyRole(Role.CARPENTER, NotificationType.PAYMENT, "Payment submitted",
+                user.getEmail() + " submitted a payment for " + invoice.getInvoiceNumber(), "/carpenter/billing");
         return PaymentResponse.from(payment);
     }
 
@@ -58,21 +71,29 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse approve(UUID id, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
         Payment payment = requirePending(find(id));
         if (payment.getAmount().compareTo(payment.getInvoice().getBalanceDue()) > 0) {
             throw new UnauthorisedOperationException("Payment cannot exceed the invoice balance.");
         }
         payment.approve();
         payment.getInvoice().applyPayment(payment.getAmount());
+        auditLogService.record(user, AuditAction.APPROVED, "Payment", payment.getId(),
+                "Approved payment for " + payment.getInvoice().getInvoiceNumber());
+        notificationService.notifyUser(payment.getCustomer().getUser(), NotificationType.PAYMENT, "Payment approved",
+                "Your payment for " + payment.getInvoice().getInvoiceNumber() + " was approved.", "/customer/billing");
         return PaymentResponse.from(payment);
     }
 
     @Transactional
     public PaymentResponse reject(UUID id, PaymentDecisionRequest request, Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
         Payment payment = requirePending(find(id));
         payment.reject(clean(request.notes()));
+        auditLogService.record(user, AuditAction.REJECTED, "Payment", payment.getId(),
+                "Rejected payment for " + payment.getInvoice().getInvoiceNumber());
+        notificationService.notifyUser(payment.getCustomer().getUser(), NotificationType.PAYMENT, "Payment rejected",
+                "Your payment for " + payment.getInvoice().getInvoiceNumber() + " was rejected.", "/customer/billing");
         return PaymentResponse.from(payment);
     }
 

@@ -49,6 +49,9 @@ public class Project extends AuditableEntity {
     @Column(name = "planned_completion_date")
     private LocalDate plannedCompletionDate;
 
+    @Column(name = "actual_start_date")
+    private LocalDate actualStartDate;
+
     @Column(name = "actual_completion_date")
     private LocalDate actualCompletionDate;
 
@@ -74,6 +77,7 @@ public class Project extends AuditableEntity {
     public int getProgress() { return progress; }
     public LocalDate getPlannedStartDate() { return plannedStartDate; }
     public LocalDate getPlannedCompletionDate() { return plannedCompletionDate; }
+    public LocalDate getActualStartDate() { return actualStartDate; }
     public LocalDate getActualCompletionDate() { return actualCompletionDate; }
     public String getNotes() { return notes; }
 
@@ -83,9 +87,10 @@ public class Project extends AuditableEntity {
         this.notes = notes;
     }
 
-    public void changeStatus(ProjectStatus status, int progress, LocalDate actualCompletionDate) {
+    public void changeStatus(ProjectStatus status, int progress, LocalDate actualStartDate, LocalDate actualCompletionDate) {
         this.status = status;
         this.progress = progress;
+        this.actualStartDate = actualStartDate;
         this.actualCompletionDate = actualCompletionDate;
     }
 }

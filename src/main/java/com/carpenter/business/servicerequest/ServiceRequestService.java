@@ -1,10 +1,14 @@
 package com.carpenter.business.servicerequest;
 
 import com.carpenter.business.common.PageResponse;
+import com.carpenter.business.audit.AuditAction;
+import com.carpenter.business.audit.AuditLogService;
 import com.carpenter.business.customer.Customer;
 import com.carpenter.business.customer.CustomerRepository;
 import com.carpenter.business.exception.ResourceNotFoundException;
 import com.carpenter.business.exception.UnauthorisedOperationException;
+import com.carpenter.business.notification.NotificationService;
+import com.carpenter.business.notification.NotificationType;
 import com.carpenter.business.security.CurrentUser;
 import com.carpenter.business.servicerequest.dto.ServiceRequestCreateRequest;
 import com.carpenter.business.servicerequest.dto.ServiceRequestResponse;
@@ -43,12 +47,17 @@ public class ServiceRequestService {
     private final ServiceRequestRepository serviceRequestRepository;
     private final CustomerRepository customerRepository;
     private final CurrentUser currentUser;
+    private final NotificationService notificationService;
+    private final AuditLogService auditLogService;
 
     public ServiceRequestService(ServiceRequestRepository serviceRequestRepository,
-                                 CustomerRepository customerRepository, CurrentUser currentUser) {
+                                 CustomerRepository customerRepository, CurrentUser currentUser,
+                                 NotificationService notificationService, AuditLogService auditLogService) {
         this.serviceRequestRepository = serviceRequestRepository;
         this.customerRepository = customerRepository;
         this.currentUser = currentUser;
+        this.notificationService = notificationService;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional
@@ -58,6 +67,10 @@ public class ServiceRequestService {
                 .orElseThrow(() -> new ResourceNotFoundException("Customer profile was not found."));
         ServiceRequest saved = serviceRequestRepository.save(new ServiceRequest(customer, trim(request.title()),
                 trim(request.description()), trim(request.preferredContactMethod()), trim(request.siteAddress())));
+        auditLogService.record(user, AuditAction.CREATED, "ServiceRequest", saved.getId(),
+                "Created service request " + saved.getTitle());
+        notificationService.notifyRole(Role.CARPENTER, NotificationType.SERVICE_REQUEST, "New service request",
+                customer.getFullName() + " submitted " + saved.getTitle(), "/carpenter/requests");
         return ServiceRequestResponse.from(saved);
     }
 
@@ -102,12 +115,16 @@ public class ServiceRequestService {
     @Transactional
     public ServiceRequestResponse updateStatus(UUID id, ServiceRequestStatusUpdateRequest update,
                                                Authentication authentication) {
-        currentUser.requireRole(authentication, Role.CARPENTER);
+        User user = currentUser.requireRole(authentication, Role.CARPENTER);
         ServiceRequest request = find(id);
         if (!ALLOWED_TRANSITIONS.getOrDefault(request.getStatus(), Set.of()).contains(update.status())) {
             throw new UnauthorisedOperationException("Invalid service request status transition.");
         }
         request.changeStatus(update.status());
+        auditLogService.record(user, AuditAction.STATUS_CHANGED, "ServiceRequest", request.getId(),
+                "Changed service request status to " + request.getStatus());
+        notificationService.notifyUser(request.getCustomer().getUser(), NotificationType.SERVICE_REQUEST,
+                "Request status updated", request.getTitle() + " is now " + request.getStatus(), "/customer/requests");
         return ServiceRequestResponse.from(request);
     }
 

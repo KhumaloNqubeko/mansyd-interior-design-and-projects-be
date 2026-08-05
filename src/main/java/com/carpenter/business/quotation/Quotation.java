@@ -51,6 +51,9 @@ public class Quotation extends AuditableEntity {
     @Column(nullable = false, length = 1000)
     private String notes;
 
+    @Column(name = "rejection_notes", nullable = false, length = 1000)
+    private String rejectionNotes = "";
+
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal = BigDecimal.ZERO;
 
@@ -84,6 +87,7 @@ public class Quotation extends AuditableEntity {
     public QuotationStatus getStatus() { return status; }
     public LocalDate getExpiryDate() { return expiryDate; }
     public String getNotes() { return notes; }
+    public String getRejectionNotes() { return rejectionNotes; }
     public BigDecimal getSubtotal() { return subtotal; }
     public BigDecimal getDiscountTotal() { return discountTotal; }
     public BigDecimal getTaxTotal() { return taxTotal; }
@@ -93,6 +97,11 @@ public class Quotation extends AuditableEntity {
     public void update(LocalDate expiryDate, String notes) {
         this.expiryDate = expiryDate;
         this.notes = notes;
+    }
+
+    public void reject(String rejectionNotes) {
+        this.status = QuotationStatus.REJECTED;
+        this.rejectionNotes = rejectionNotes;
     }
 
     public void addItem(QuotationItem item) {

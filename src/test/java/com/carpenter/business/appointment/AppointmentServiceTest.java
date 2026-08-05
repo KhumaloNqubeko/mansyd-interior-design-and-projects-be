@@ -6,9 +6,11 @@ import static org.mockito.Mockito.when;
 
 import com.carpenter.business.appointment.dto.AppointmentRequest;
 import com.carpenter.business.appointment.dto.AppointmentStatusUpdateRequest;
+import com.carpenter.business.audit.AuditLogService;
 import com.carpenter.business.customer.Customer;
 import com.carpenter.business.customer.CustomerRepository;
 import com.carpenter.business.exception.UnauthorisedOperationException;
+import com.carpenter.business.notification.NotificationService;
 import com.carpenter.business.project.ProjectRepository;
 import com.carpenter.business.security.CurrentUser;
 import com.carpenter.business.servicerequest.ServiceRequestRepository;
@@ -33,12 +35,15 @@ class AppointmentServiceTest {
     @Mock ServiceRequestRepository serviceRequests;
     @Mock ProjectRepository projects;
     @Mock CurrentUser currentUser;
+    @Mock NotificationService notificationService;
+    @Mock AuditLogService auditLogService;
     @Mock Authentication authentication;
     private AppointmentService service;
 
     @BeforeEach
     void setUp() {
-        service = new AppointmentService(appointments, customers, serviceRequests, projects, currentUser);
+        service = new AppointmentService(appointments, customers, serviceRequests, projects, currentUser,
+                notificationService, auditLogService);
     }
 
     @Test

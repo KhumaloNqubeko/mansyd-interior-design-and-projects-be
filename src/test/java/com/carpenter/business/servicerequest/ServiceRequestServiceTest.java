@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.carpenter.business.audit.AuditLogService;
 import com.carpenter.business.customer.Customer;
 import com.carpenter.business.customer.CustomerRepository;
 import com.carpenter.business.exception.UnauthorisedOperationException;
+import com.carpenter.business.notification.NotificationService;
 import com.carpenter.business.security.CurrentUser;
 import com.carpenter.business.servicerequest.dto.ServiceRequestCreateRequest;
 import com.carpenter.business.servicerequest.dto.ServiceRequestStatusUpdateRequest;
@@ -29,12 +31,14 @@ class ServiceRequestServiceTest {
     @Mock ServiceRequestRepository requests;
     @Mock CustomerRepository customers;
     @Mock CurrentUser currentUser;
+    @Mock NotificationService notificationService;
+    @Mock AuditLogService auditLogService;
     @Mock Authentication authentication;
     private ServiceRequestService service;
 
     @BeforeEach
     void setUp() {
-        service = new ServiceRequestService(requests, customers, currentUser);
+        service = new ServiceRequestService(requests, customers, currentUser, notificationService, auditLogService);
     }
 
     @Test
