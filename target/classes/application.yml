@@ -4,9 +4,9 @@ spring:
   profiles:
     default: local
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-morning-heart-ax2ko8sz-pooler.c-4.us-east-2.aws.neon.tech/neondb?user=neondb_owner&password=npg_eKsjTdN1lz2C&sslmode=require&channelBinding=require}
-    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
-    password: ${SPRING_DATASOURCE_PASSWORD:npg_eKsjTdN1lz2C}
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -35,7 +35,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 app:
-  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:4200}
+  frontend-origin: ${FRONTEND_ORIGIN:https://mansyd-interior-design-and-projects-fe.onrender.com}
   file-upload-directory: ${FILE_UPLOAD_DIRECTORY:./uploads}
   seed-local-users: ${SEED_LOCAL_USERS:true}
 
