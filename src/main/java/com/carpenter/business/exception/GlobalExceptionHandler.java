@@ -32,6 +32,11 @@ public class GlobalExceptionHandler {
         return response(HttpStatus.BAD_REQUEST, "MALFORMED_REQUEST", "The request body is malformed.", request, List.of());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<ApiError> invalidArgument(IllegalArgumentException ex, HttpServletRequest request) {
+        return response(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", ex.getMessage(), request, List.of());
+    }
+
     @ExceptionHandler(DuplicateResourceException.class)
     ResponseEntity<ApiError> duplicate(DuplicateResourceException ex, HttpServletRequest request) {
         return response(HttpStatus.CONFLICT, "DUPLICATE_RESOURCE", ex.getMessage(), request, List.of());
@@ -58,4 +63,3 @@ public class GlobalExceptionHandler {
                 status.getReasonPhrase(), code, message, request.getRequestURI(), fields));
     }
 }
-

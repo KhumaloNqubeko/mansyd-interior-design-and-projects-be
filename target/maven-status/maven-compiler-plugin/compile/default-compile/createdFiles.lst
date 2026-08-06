@@ -45,6 +45,7 @@ com\carpenter\business\quotation\QuotationController.class
 com\carpenter\business\exception\ResourceNotFoundException.class
 com\carpenter\business\quotation\Quotation.class
 com\carpenter\business\project\dto\ProjectUpdateRequest.class
+com\carpenter\business\portfolio\PortfolioImageController.class
 com\carpenter\business\notification\NotificationRepository.class
 com\carpenter\business\servicerequest\dto\ServiceRequestStatusUpdateRequest.class
 com\carpenter\business\auth\dto\LoginRequest.class
@@ -63,6 +64,7 @@ com\carpenter\business\notification\NotificationType.class
 com\carpenter\business\order\dto\OrderResponse.class
 com\carpenter\business\quotation\dto\QuotationRejectRequest.class
 com\carpenter\business\expense\ExpenseCategory.class
+com\carpenter\business\portfolio\PortfolioImageResponse.class
 com\carpenter\business\inventory\InventoryService$1.class
 com\carpenter\business\notification\NotificationService.class
 com\carpenter\business\reporting\ReportingService.class
@@ -102,6 +104,7 @@ com\carpenter\business\inventory\MaterialRepository.class
 com\carpenter\business\common\PageResponse.class
 com\carpenter\business\invoice\InvoiceService.class
 com\carpenter\business\config\OpenApiConfig.class
+com\carpenter\business\portfolio\PortfolioImage.class
 com\carpenter\business\project\Project.class
 com\carpenter\business\auth\AuthenticationService.class
 com\carpenter\business\exception\UnauthorisedOperationException.class
@@ -109,6 +112,7 @@ com\carpenter\business\expense\ExpenseService.class
 com\carpenter\business\document\Document.class
 com\carpenter\business\quotation\QuotationService.class
 com\carpenter\business\payment\Payment.class
+com\carpenter\business\portfolio\PortfolioImageRepository.class
 com\carpenter\business\project\ProjectService.class
 com\carpenter\business\quotation\dto\QuotationItemResponse.class
 com\carpenter\business\auth\AuthenticationController.class
@@ -138,6 +142,7 @@ com\carpenter\business\quotation\QuotationCalculationService.class
 com\carpenter\business\expense\Expense.class
 com\carpenter\business\inventory\StockTransaction.class
 com\carpenter\business\exception\GlobalExceptionHandler.class
+com\carpenter\business\portfolio\PortfolioImageService.class
 com\carpenter\business\quotation\QuotationItemRepository.class
 com\carpenter\business\audit\AuditLogController.class
 com\carpenter\business\expense\dto\ExpenseRequest.class

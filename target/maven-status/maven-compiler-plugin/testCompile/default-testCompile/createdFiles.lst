@@ -7,6 +7,7 @@ com\carpenter\business\appointment\AppointmentServiceTest.class
 com\carpenter\business\audit\AuditLogServiceTest.class
 com\carpenter\business\customer\CustomerControllerTest.class
 com\carpenter\business\notification\NotificationServiceTest.class
+com\carpenter\business\portfolio\PortfolioImageServiceTest.class
 com\carpenter\business\integration\PostgresIntegrationTest.class
 com\carpenter\business\inventory\InventoryServiceTest.class
 com\carpenter\business\servicerequest\ServiceRequestServiceTest.class

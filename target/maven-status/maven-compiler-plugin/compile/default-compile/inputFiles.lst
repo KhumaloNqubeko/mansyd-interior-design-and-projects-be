@@ -98,6 +98,11 @@ C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\s
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\payment\PaymentRepository.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\payment\PaymentService.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\payment\PaymentStatus.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\portfolio\PortfolioImage.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\portfolio\PortfolioImageController.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\portfolio\PortfolioImageRepository.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\portfolio\PortfolioImageResponse.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\portfolio\PortfolioImageService.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\project\dto\ProjectResponse.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\project\dto\ProjectStatusUpdateRequest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\project\dto\ProjectTimelineRequest.java
