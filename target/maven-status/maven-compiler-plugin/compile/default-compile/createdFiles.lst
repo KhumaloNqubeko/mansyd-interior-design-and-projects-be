@@ -99,6 +99,7 @@ com\carpenter\business\inventory\InventoryService.class
 com\carpenter\business\customer\CustomerService.class
 com\carpenter\business\order\OrderRepository.class
 com\carpenter\business\config\SecurityConfig.class
+com\carpenter\business\auth\dto\CsrfTokenResponse.class
 com\carpenter\business\inventory\StockTransactionRepository.class
 com\carpenter\business\inventory\MaterialRepository.class
 com\carpenter\business\common\PageResponse.class

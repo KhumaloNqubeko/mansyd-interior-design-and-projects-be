@@ -51,6 +51,7 @@ public class SecurityConfig {
                     .maximumSessions(1))
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/portfolio", "/api/portfolio/*/content").permitAll()
                     .requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .requestMatchers("/api/carpenter/**").hasRole("CARPENTER")

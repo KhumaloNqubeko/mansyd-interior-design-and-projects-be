@@ -16,6 +16,7 @@ C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\s
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\auth\AuthenticationController.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\auth\AuthenticationService.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\auth\dto\AddressRequest.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\auth\dto\CsrfTokenResponse.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\auth\dto\LoginRequest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\auth\dto\RegistrationRequest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\main\java\com\carpenter\business\auth\dto\SessionResponse.java

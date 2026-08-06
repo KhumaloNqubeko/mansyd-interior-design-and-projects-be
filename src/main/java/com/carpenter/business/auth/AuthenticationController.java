@@ -1,6 +1,7 @@
 package com.carpenter.business.auth;
 
 import com.carpenter.business.auth.dto.LoginRequest;
+import com.carpenter.business.auth.dto.CsrfTokenResponse;
 import com.carpenter.business.auth.dto.RegistrationRequest;
 import com.carpenter.business.auth.dto.SessionResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,5 +46,9 @@ public class AuthenticationController {
     SessionResponse session(Authentication authentication) {
         return authenticationService.session(authentication);
     }
-}
 
+    @GetMapping("/csrf")
+    CsrfTokenResponse csrf(CsrfToken csrfToken) {
+        return new CsrfTokenResponse(csrfToken.getToken());
+    }
+}
