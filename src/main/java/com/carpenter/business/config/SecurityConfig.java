@@ -37,9 +37,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper objectMapper,
+                                            @Value("${server.servlet.session.cookie.secure:false}") boolean secureCookie,
+                                            @Value("${server.servlet.session.cookie.same-site:lax}") String sameSite) throws Exception {
         CookieCsrfTokenRepository csrfRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrfRepository.setCookiePath("/");
+        csrfRepository.setCookieCustomizer(cookie -> cookie.secure(secureCookie).sameSite(sameSite));
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName(null);
 
