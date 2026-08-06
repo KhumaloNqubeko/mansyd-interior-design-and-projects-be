@@ -12,5 +12,5 @@ COPY --from=build /workspace/target/*.jar app.jar
 RUN mkdir -p /app/uploads && chown -R app:app /app
 USER app
 EXPOSE 8080
+ENV SPRING_PROFILES_ACTIVE=prod
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-

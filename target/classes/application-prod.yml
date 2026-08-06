@@ -1,4 +1,5 @@
 app:
+  frontend-origin: ${FRONTEND_ORIGIN:https://mansyd-interior-design-and-projects-fe.onrender.com}
   seed-local-users: false
 server:
   servlet:
