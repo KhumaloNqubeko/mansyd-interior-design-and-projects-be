@@ -35,7 +35,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 app:
-  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:4200/}
+  frontend-origin: ${FRONTEND_ORIGIN}
   file-upload-directory: ${FILE_UPLOAD_DIRECTORY:./uploads}
   seed-local-users: ${SEED_LOCAL_USERS:true}
 
