@@ -4,9 +4,7 @@ C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\s
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\auth\AuthenticationServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\customer\CustomerControllerTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\document\DocumentServiceTest.java
-C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\expense\ExpenseServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\integration\PostgresIntegrationTest.java
-C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\inventory\InventoryServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\invoice\InvoiceServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\notification\NotificationServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\order\OrderServiceTest.java
@@ -15,6 +13,5 @@ C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\s
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\project\ProjectServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\quotation\QuotationCalculationServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\quotation\QuotationServiceTest.java
-C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\reporting\ReportingServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\servicerequest\ServiceRequestControllerTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\servicerequest\ServiceRequestServiceTest.java
