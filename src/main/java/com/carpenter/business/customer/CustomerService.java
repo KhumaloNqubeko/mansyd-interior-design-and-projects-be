@@ -3,6 +3,7 @@ package com.carpenter.business.customer;
 import com.carpenter.business.common.PageResponse;
 import com.carpenter.business.customer.dto.CustomerProfileResponse;
 import com.carpenter.business.customer.dto.CustomerProfileUpdateRequest;
+import com.carpenter.business.exception.DuplicateResourceException;
 import com.carpenter.business.exception.ResourceNotFoundException;
 import com.carpenter.business.security.CurrentUser;
 import com.carpenter.business.user.Role;
@@ -31,7 +32,11 @@ public class CustomerService {
     @Transactional
     public CustomerProfileResponse updateMyProfile(CustomerProfileUpdateRequest request, Authentication authentication) {
         Customer customer = customerForUser(currentUser.require(authentication));
-        customer.updateProfile(trim(request.fullName()), trim(request.phoneNumber()), trim(request.addressLine1()),
+        String phoneNumber = trim(request.phoneNumber());
+        if (customerRepository.existsByPhoneNumberAndIdNot(phoneNumber, customer.getId())) {
+            throw new DuplicateResourceException("An account with this cell number already exists.");
+        }
+        customer.updateProfile(trim(request.fullName()), phoneNumber, trim(request.addressLine1()),
                 trimToNull(request.addressLine2()), trim(request.city()), trim(request.postalCode()));
         return CustomerProfileResponse.from(customer);
     }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.carpenter.business.auth.dto.AddressRequest;
@@ -34,7 +35,7 @@ class AuthenticationServiceTest {
     @Mock PasswordEncoder encoder;
     @Mock AuthenticationManager authenticationManager;
     @Mock CurrentUser currentUser;
-    @Mock PhoneVerificationService phoneVerificationService;
+    @Mock EmailVerificationService emailVerificationService;
     @Mock HttpServletRequest httpRequest;
     @Mock HttpSession session;
     @Mock Authentication authentication;
@@ -43,7 +44,7 @@ class AuthenticationServiceTest {
     @BeforeEach
     void setUp() {
         service = new AuthenticationService(users, customers, encoder, authenticationManager, currentUser,
-                phoneVerificationService);
+                emailVerificationService);
     }
 
     @Test
@@ -62,7 +63,7 @@ class AuthenticationServiceTest {
         assertThat(userCaptor.getValue().getEmail()).isEqualTo("new.user@example.com");
         assertThat(userCaptor.getValue().getPasswordHash()).isEqualTo("bcrypt-hash");
         verify(customers).save(any(Customer.class));
-        verify(phoneVerificationService).consume("0123456789", "verified-token");
+        verify(emailVerificationService).consume("new.user@example.com", "verified-token");
     }
 
     @Test
@@ -70,7 +71,21 @@ class AuthenticationServiceTest {
         when(users.existsByEmailIgnoreCase("taken@example.com")).thenReturn(true);
 
         assertThatThrownBy(() -> service.register(registration("taken@example.com"), httpRequest))
-                .isInstanceOf(DuplicateResourceException.class);
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("An account with this email already exists.");
+
+        verifyNoInteractions(emailVerificationService, encoder);
+    }
+
+    @Test
+    void registrationRejectsDuplicatePhoneBeforeVerificationOrSaving() {
+        when(customers.existsByPhoneNumber("0123456789")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.register(registration("new@example.com"), httpRequest))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("An account with this cell number already exists.");
+
+        verifyNoInteractions(emailVerificationService, encoder);
     }
 
     @Test

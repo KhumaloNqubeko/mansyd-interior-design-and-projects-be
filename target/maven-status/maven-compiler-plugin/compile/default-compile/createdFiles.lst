@@ -63,7 +63,9 @@ com\carpenter\business\servicerequest\ServiceRequestController.class
 com\carpenter\business\appointment\AppointmentController.class
 com\carpenter\business\servicerequest\ServiceRequestService.class
 com\carpenter\business\invoice\Invoice.class
+com\carpenter\business\auth\dto\EmailVerificationRequest.class
 com\carpenter\business\order\OrderService.class
+com\carpenter\business\auth\EmailSender.class
 com\carpenter\business\security\BusinessUserDetailsService.class
 com\carpenter\business\security\CurrentUser.class
 com\carpenter\business\order\OrderController.class
@@ -72,10 +74,14 @@ com\carpenter\business\appointment\dto\AppointmentStatusUpdateRequest.class
 com\carpenter\business\customer\dto\CustomerProfileUpdateRequest.class
 com\carpenter\business\servicerequest\dto\ServiceRequestCreateRequest.class
 com\carpenter\business\supplier\dto\SupplierResponse.class
+com\carpenter\business\auth\BrevoEmailSender.class
+com\carpenter\business\auth\LoggingEmailSender.class
 com\carpenter\business\auth\dto\SessionResponse.class
 com\carpenter\business\quotation\dto\QuotationRequest.class
 com\carpenter\business\project\ProjectStatus.class
 com\carpenter\business\appointment\AppointmentStatus.class
+com\carpenter\business\auth\EmailVerificationService.class
+com\carpenter\business\auth\EmailVerificationService$VerifiedEmail.class
 com\carpenter\business\invoice\dto\InvoiceUpdateRequest.class
 com\carpenter\business\customer\CustomerService.class
 com\carpenter\business\order\OrderRepository.class
@@ -86,6 +92,7 @@ com\carpenter\business\invoice\InvoiceService.class
 com\carpenter\business\config\OpenApiConfig.class
 com\carpenter\business\portfolio\PortfolioImage.class
 com\carpenter\business\project\Project.class
+com\carpenter\business\auth\EmailVerificationService$Challenge.class
 com\carpenter\business\auth\AuthenticationService.class
 com\carpenter\business\exception\UnauthorisedOperationException.class
 com\carpenter\business\document\Document.class
@@ -97,6 +104,7 @@ com\carpenter\business\quotation\dto\QuotationItemResponse.class
 com\carpenter\business\auth\AuthenticationController.class
 com\carpenter\business\servicerequest\ServiceRequestStatus.class
 com\carpenter\business\user\Role.class
+com\carpenter\business\auth\dto\EmailCodeVerificationRequest.class
 com\carpenter\business\appointment\dto\AppointmentResponse.class
 com\carpenter\business\auth\dto\AddressRequest.class
 com\carpenter\business\project\ProjectUpdateRepository.class
@@ -122,6 +130,7 @@ com\carpenter\business\audit\AuditLogController.class
 com\carpenter\business\document\DocumentController.class
 com\carpenter\business\project\dto\ProjectTimelineResponse.class
 com\carpenter\business\appointment\AppointmentRepository.class
+com\carpenter\business\auth\EmailSenderConfiguration.class
 com\carpenter\business\order\OrderStatus.class
 com\carpenter\business\document\DocumentType.class
 com\carpenter\business\project\dto\ProjectTimelineRequest.class
@@ -129,3 +138,4 @@ com\carpenter\business\appointment\dto\AppointmentRequest.class
 com\carpenter\business\notification\dto\NotificationResponse.class
 com\carpenter\business\audit\AuditLog.class
 com\carpenter\business\quotation\QuotationItem.class
+com\carpenter\business\auth\dto\EmailVerificationResponse.class

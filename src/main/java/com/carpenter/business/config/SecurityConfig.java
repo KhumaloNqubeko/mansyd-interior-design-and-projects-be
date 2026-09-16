@@ -50,12 +50,12 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.csrfTokenRepository(csrfRepository).csrfTokenRequestHandler(requestHandler)
                     .ignoringRequestMatchers("/api/auth/register", "/api/auth/login",
-                            "/api/auth/phone-verifications", "/api/auth/phone-verifications/**"))
+                            "/api/auth/email-verifications", "/api/auth/email-verifications/**"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                     .maximumSessions(1))
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login",
-                            "/api/auth/phone-verifications", "/api/auth/phone-verifications/**").permitAll()
+                            "/api/auth/email-verifications", "/api/auth/email-verifications/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/portfolio", "/api/portfolio/*/content").permitAll()
                     .requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()

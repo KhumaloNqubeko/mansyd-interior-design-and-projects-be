@@ -10,7 +10,7 @@ Java 21 / Spring Boot 3.5 REST API using PostgreSQL, Flyway, JPA, Spring Securit
 
 Datasource settings use `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD`. `FRONTEND_ORIGIN` controls the sole credentialed CORS origin. `FILE_UPLOAD_DIRECTORY` is reserved for the upcoming service-request attachment slice.
 
-Production cellphone verification sends SMS messages through Twilio. Configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER` for the `prod` profile. Non-production profiles log the short-lived verification code for local testing.
+Registration verification sends email through Brevo whenever `BREVO_API_KEY` and `BREVO_SENDER_EMAIL` are both configured. `BREVO_SENDER_NAME` is optional and defaults to `Carpentry Business`. If neither required setting is configured, the short-lived verification code is logged for local testing. Supplying only one required setting prevents startup so a partially configured email service cannot silently fall back to logging.
 
 ## Run and test
 

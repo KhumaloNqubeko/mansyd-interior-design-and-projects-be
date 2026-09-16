@@ -27,7 +27,7 @@ public class Customer extends AuditableEntity {
     @Column(name = "full_name", nullable = false, length = 120)
     private String fullName;
 
-    @Column(name = "phone_number", nullable = false, length = 30)
+    @Column(name = "phone_number", nullable = false, unique = true, length = 30)
     private String phoneNumber;
 
     @Column(name = "address_line_1", nullable = false, length = 160)

@@ -31,34 +31,45 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final CurrentUser currentUser;
-    private final PhoneVerificationService phoneVerificationService;
+    private final EmailVerificationService emailVerificationService;
 
     public AuthenticationService(UserRepository userRepository, CustomerRepository customerRepository,
                                  PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-                                 CurrentUser currentUser, PhoneVerificationService phoneVerificationService) {
+                                 CurrentUser currentUser, EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.currentUser = currentUser;
-        this.phoneVerificationService = phoneVerificationService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @Transactional
     public SessionResponse register(RegistrationRequest request, HttpServletRequest httpRequest) {
         String email = normalize(request.email());
-        if (userRepository.existsByEmailIgnoreCase(email)) {
-            throw new DuplicateResourceException("An account with this email already exists.");
-        }
-        phoneVerificationService.consume(request.phoneNumber(), request.phoneVerificationToken());
+        String phoneNumber = request.phoneNumber().trim();
+        ensureRegistrationContactsAvailable(email, phoneNumber);
+        emailVerificationService.consume(email, request.emailVerificationToken());
         User user = userRepository.save(new User(email, passwordEncoder.encode(request.password()),
                 Role.CUSTOMER, AccountStatus.ACTIVE));
         Customer customer = customerRepository.save(new Customer(user, request.fullName().trim(),
-                request.phoneNumber().trim(), request.address().addressLine1().trim(),
+                phoneNumber, request.address().addressLine1().trim(),
                 trimToNull(request.address().addressLine2()), request.address().city().trim(),
                 request.address().postalCode().trim()));
         Authentication authentication = authenticate(email, request.password(), httpRequest);
         return response(user, customer.getFullName());
+    }
+
+    @Transactional(readOnly = true)
+    public void ensureRegistrationContactsAvailable(String suppliedEmail, String suppliedPhoneNumber) {
+        String email = normalize(suppliedEmail);
+        String phoneNumber = suppliedPhoneNumber.trim();
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new DuplicateResourceException("An account with this email already exists.");
+        }
+        if (customerRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new DuplicateResourceException("An account with this cell number already exists.");
+        }
     }
 
     public SessionResponse login(LoginRequest request, HttpServletRequest httpRequest) {

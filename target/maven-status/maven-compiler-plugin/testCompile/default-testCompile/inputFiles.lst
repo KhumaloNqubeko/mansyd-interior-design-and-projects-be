@@ -2,7 +2,10 @@ C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\s
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\audit\AuditLogServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\auth\AuthenticationControllerTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\auth\AuthenticationServiceTest.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\auth\EmailSenderConfigurationTest.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\auth\EmailVerificationServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\customer\CustomerControllerTest.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\customer\CustomerServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\document\DocumentServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\integration\PostgresIntegrationTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\invoice\InvoiceServiceTest.java
