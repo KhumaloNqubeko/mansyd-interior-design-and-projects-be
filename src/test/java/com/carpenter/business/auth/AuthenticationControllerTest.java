@@ -21,12 +21,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 class AuthenticationControllerTest {
     private AuthenticationService service;
+    private PhoneVerificationService phoneVerificationService;
     private MockMvc mvc;
 
     @BeforeEach
     void setUp() {
         service = Mockito.mock(AuthenticationService.class);
-        mvc = MockMvcBuilders.standaloneSetup(new AuthenticationController(service))
+        phoneVerificationService = Mockito.mock(PhoneVerificationService.class);
+        mvc = MockMvcBuilders.standaloneSetup(new AuthenticationController(service, phoneVerificationService))
                 .setControllerAdvice(new GlobalExceptionHandler()).build();
     }
 
@@ -50,4 +52,3 @@ class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.password").doesNotExist());
     }
 }
-

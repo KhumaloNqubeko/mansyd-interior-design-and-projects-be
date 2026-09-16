@@ -1,6 +1,11 @@
 app:
   frontend-origin: ${FRONTEND_ORIGIN:https://mansyd-interior-design-and-projects-fe.onrender.com}
   seed-local-users: false
+  sms:
+    twilio:
+      account-sid: ${TWILIO_ACCOUNT_SID}
+      auth-token: ${TWILIO_AUTH_TOKEN}
+      from-number: ${TWILIO_FROM_NUMBER}
 server:
   servlet:
     session:

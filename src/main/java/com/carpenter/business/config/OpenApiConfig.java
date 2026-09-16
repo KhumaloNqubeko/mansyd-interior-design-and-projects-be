@@ -10,9 +10,8 @@ public class OpenApiConfig {
     @Bean
     OpenAPI carpenterApi() {
         return new OpenAPI().info(new Info()
-                .title("Carpenter Business Management API")
+                .title("Carpentry Business Management API")
                 .version("v1")
-                .description("Session-authenticated API for carpenter business operations."));
+                .description("Session-authenticated API for carpentry business operations."));
     }
 }
-

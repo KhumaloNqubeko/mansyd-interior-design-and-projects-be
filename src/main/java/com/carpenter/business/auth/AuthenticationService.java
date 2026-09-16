@@ -31,15 +31,17 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final CurrentUser currentUser;
+    private final PhoneVerificationService phoneVerificationService;
 
     public AuthenticationService(UserRepository userRepository, CustomerRepository customerRepository,
                                  PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-                                 CurrentUser currentUser) {
+                                 CurrentUser currentUser, PhoneVerificationService phoneVerificationService) {
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.currentUser = currentUser;
+        this.phoneVerificationService = phoneVerificationService;
     }
 
     @Transactional
@@ -48,6 +50,7 @@ public class AuthenticationService {
         if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new DuplicateResourceException("An account with this email already exists.");
         }
+        phoneVerificationService.consume(request.phoneNumber(), request.phoneVerificationToken());
         User user = userRepository.save(new User(email, passwordEncoder.encode(request.password()),
                 Role.CUSTOMER, AccountStatus.ACTIVE));
         Customer customer = customerRepository.save(new Customer(user, request.fullName().trim(),
@@ -95,4 +98,3 @@ public class AuthenticationService {
     private String normalize(String email) { return email.trim().toLowerCase(Locale.ROOT); }
     private String trimToNull(String value) { return value == null || value.isBlank() ? null : value.trim(); }
 }
-

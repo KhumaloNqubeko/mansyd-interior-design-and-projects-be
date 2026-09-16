@@ -34,6 +34,7 @@ class AuthenticationServiceTest {
     @Mock PasswordEncoder encoder;
     @Mock AuthenticationManager authenticationManager;
     @Mock CurrentUser currentUser;
+    @Mock PhoneVerificationService phoneVerificationService;
     @Mock HttpServletRequest httpRequest;
     @Mock HttpSession session;
     @Mock Authentication authentication;
@@ -41,13 +42,14 @@ class AuthenticationServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new AuthenticationService(users, customers, encoder, authenticationManager, currentUser);
+        service = new AuthenticationService(users, customers, encoder, authenticationManager, currentUser,
+                phoneVerificationService);
     }
 
     @Test
     void registrationNormalizesEmailHashesPasswordAndCreatesCustomer() {
         RegistrationRequest request = registration(" New.User@Example.COM ");
-        when(encoder.encode("StrongPass1!")).thenReturn("bcrypt-hash");
+        when(encoder.encode("Strong1!")).thenReturn("bcrypt-hash");
         when(users.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(customers.save(any(Customer.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
@@ -60,6 +62,7 @@ class AuthenticationServiceTest {
         assertThat(userCaptor.getValue().getEmail()).isEqualTo("new.user@example.com");
         assertThat(userCaptor.getValue().getPasswordHash()).isEqualTo("bcrypt-hash");
         verify(customers).save(any(Customer.class));
+        verify(phoneVerificationService).consume("0123456789", "verified-token");
     }
 
     @Test
@@ -86,8 +89,7 @@ class AuthenticationServiceTest {
     }
 
     private RegistrationRequest registration(String email) {
-        return new RegistrationRequest("New User", email, "+27123456789", "StrongPass1!",
+        return new RegistrationRequest("New User", email, "0123456789", "Strong1!", "verified-token",
                 new AddressRequest("1 Main Road", null, "Johannesburg", "2000"));
     }
 }
-

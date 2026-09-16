@@ -10,11 +10,13 @@ import jakarta.validation.constraints.Size;
 public record RegistrationRequest(
         @NotBlank @Size(max = 120) String fullName,
         @NotBlank @Email @Size(max = 254) String email,
-        @NotBlank @Size(max = 30) String phoneNumber,
         @NotBlank
-        @Size(min = 12, max = 72)
+        @Pattern(regexp = "\\d{10}", message = "must contain exactly 10 digits")
+        String phoneNumber,
+        @NotBlank
+        @Size(min = 8, max = 11)
         @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$",
                 message = "must include upper-case, lower-case, number and special characters")
         String password,
+        @NotBlank String phoneVerificationToken,
         @NotNull @Valid AddressRequest address) { }
-
