@@ -36,23 +36,28 @@ class PostgresIntegrationTest {
 
     @Test
     void loginContextIsPersistedInPostgresAndRemovedOnLogout() {
-        var session = sessions.createSession();
+        verifySessionPersistence(sessions);
+    }
+
+    private <S extends org.springframework.session.Session> void verifySessionPersistence(
+            org.springframework.session.SessionRepository<S> repository) {
+        S session = repository.createSession();
         var context = org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
         context.setAuthentication(org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated(
                 org.springframework.security.core.userdetails.User.withUsername("session@test.example")
                         .password("hash").roles("CUSTOMER").build(), null, java.util.List.of()));
         session.setAttribute(org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-        sessions.save(session);
+        repository.save(session);
         try {
             assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM SPRING_SESSION WHERE SESSION_ID = ?", Integer.class, session.getId())).isEqualTo(1);
-            var restored = sessions.findById(session.getId());
+            S restored = repository.findById(session.getId());
             org.springframework.security.core.context.SecurityContext restoredContext = restored.getAttribute(
                     org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
             assertThat(restoredContext.getAuthentication().getName()).isEqualTo("session@test.example");
         } finally {
-            sessions.deleteById(session.getId());
+            repository.deleteById(session.getId());
         }
-        assertThat(sessions.findById(session.getId())).isNull();
+        assertThat(repository.findById(session.getId())).isNull();
     }
     @Autowired jakarta.persistence.EntityManager entities;
     @Autowired com.carpenter.business.project.ProjectCollaborationService collaboration;
