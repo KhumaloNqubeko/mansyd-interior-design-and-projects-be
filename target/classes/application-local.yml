@@ -7,3 +7,5 @@ server:
       cookie:
         secure: false
 
+app:
+  mobile-preview-origin: ${MOBILE_PREVIEW_ORIGIN:http://localhost:4300}

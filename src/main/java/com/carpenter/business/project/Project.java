@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -58,6 +59,16 @@ public class Project extends AuditableEntity {
     @Column(nullable = false, length = 1000)
     private String notes;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "completion_review_status", nullable = false, length = 30)
+    private CompletionReviewStatus completionReviewStatus = CompletionReviewStatus.NOT_REQUESTED;
+    @Column(name = "completion_review_id")
+    private UUID completionReviewId;
+    @Column(name = "customer_confirmed_at")
+    private Instant customerConfirmedAt;
+    @Column(name = "customer_confirmed_by")
+    private UUID customerConfirmedBy;
+
     protected Project() { }
 
     public Project(String projectNumber, Order order) {
@@ -80,6 +91,23 @@ public class Project extends AuditableEntity {
     public LocalDate getActualStartDate() { return actualStartDate; }
     public LocalDate getActualCompletionDate() { return actualCompletionDate; }
     public String getNotes() { return notes; }
+    public CompletionReviewStatus getCompletionReviewStatus() { return completionReviewStatus; }
+    public UUID getCompletionReviewId() { return completionReviewId; }
+    public Instant getCustomerConfirmedAt() { return customerConfirmedAt; }
+    public UUID getCustomerConfirmedBy() { return customerConfirmedBy; }
+
+    public void requestCompletionReview() {
+        completionReviewStatus = CompletionReviewStatus.PENDING_REVIEW;
+        completionReviewId = UUID.randomUUID();
+        customerConfirmedAt = null;
+        customerConfirmedBy = null;
+    }
+
+    public void reviewCompletion(boolean confirmed, UUID userId) {
+        completionReviewStatus = confirmed ? CompletionReviewStatus.CONFIRMED : CompletionReviewStatus.ISSUE_REPORTED;
+        customerConfirmedAt = confirmed ? Instant.now() : null;
+        customerConfirmedBy = confirmed ? userId : null;
+    }
 
     public void update(LocalDate plannedStartDate, LocalDate plannedCompletionDate, String notes) {
         this.plannedStartDate = plannedStartDate;

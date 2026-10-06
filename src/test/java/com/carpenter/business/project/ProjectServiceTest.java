@@ -33,11 +33,12 @@ class ProjectServiceTest {
     @Mock ProjectUpdateRepository updates;
     @Mock CurrentUser currentUser;
     @Mock Authentication authentication;
+    @Mock com.carpenter.business.notification.NotificationService notifications;
     private ProjectService service;
 
     @BeforeEach
     void setUp() {
-        service = new ProjectService(projects, updates, null, currentUser);
+        service = new ProjectService(projects, updates, null, currentUser, notifications);
     }
 
     @Test
@@ -58,7 +59,7 @@ class ProjectServiceTest {
         Project project = project();
         project.changeStatus(ProjectStatus.SCHEDULED, 10, null, null);
         when(currentUser.requireRole(authentication, Role.CARPENTER)).thenReturn(user(Role.CARPENTER));
-        when(projects.findById(project.getId())).thenReturn(Optional.of(project));
+        when(projects.findLockedById(project.getId())).thenReturn(Optional.of(project));
 
         assertThatThrownBy(() -> service.updateStatus(project.getId(),
                 new ProjectStatusUpdateRequest(ProjectStatus.COMPLETED), authentication))
@@ -70,7 +71,7 @@ class ProjectServiceTest {
         Project project = project();
         project.changeStatus(ProjectStatus.SCHEDULED, 10, null, null);
         when(currentUser.requireRole(authentication, Role.CARPENTER)).thenReturn(user(Role.CARPENTER));
-        when(projects.findById(project.getId())).thenReturn(Optional.of(project));
+        when(projects.findLockedById(project.getId())).thenReturn(Optional.of(project));
 
         var response = service.updateStatus(project.getId(), new ProjectStatusUpdateRequest(ProjectStatus.IN_PROGRESS), authentication);
 

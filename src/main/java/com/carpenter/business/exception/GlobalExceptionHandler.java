@@ -52,6 +52,10 @@ public class GlobalExceptionHandler {
         return response(HttpStatus.UNAUTHORIZED, "AUTHENTICATION_FAILED", ex.getMessage(), request, List.of());
     }
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    ResponseEntity<ApiError> uploadTooLarge(Exception ex, HttpServletRequest request) {
+        return response(HttpStatus.PAYLOAD_TOO_LARGE, "UPLOAD_TOO_LARGE", "The uploaded file is too large.", request, List.of());
+    }
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiError> unexpected(Exception ex, HttpServletRequest request) {
         return response(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", "An unexpected error occurred.", request, List.of());

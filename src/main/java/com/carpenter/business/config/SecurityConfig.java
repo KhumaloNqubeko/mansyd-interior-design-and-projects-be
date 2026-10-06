@@ -74,9 +74,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource(@Value("${app.frontend-origin}") String origin) {
+    CorsConfigurationSource corsConfigurationSource(@Value("${app.frontend-origin}") String origin,
+            @Value("${app.mobile-origin:https://localhost}") String mobileOrigin,
+            @Value("${app.mobile-preview-origin:}") String mobilePreviewOrigin) {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(normalizeOrigin(origin)));
+        java.util.ArrayList<String> origins = new java.util.ArrayList<>();
+        origins.add(normalizeOrigin(origin));
+        if (!mobileOrigin.isBlank()) origins.add(normalizeOrigin(mobileOrigin));
+        if (!mobilePreviewOrigin.isBlank()) origins.add(normalizeOrigin(mobilePreviewOrigin));
+        config.setAllowedOrigins(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Content-Type", "X-XSRF-TOKEN"));
         config.setAllowCredentials(true);

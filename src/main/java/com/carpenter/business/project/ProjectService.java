@@ -1,6 +1,8 @@
 package com.carpenter.business.project;
 
 import com.carpenter.business.common.PageResponse;
+import com.carpenter.business.notification.NotificationService;
+import com.carpenter.business.notification.NotificationType;
 import com.carpenter.business.exception.ResourceNotFoundException;
 import com.carpenter.business.exception.UnauthorisedOperationException;
 import com.carpenter.business.order.Order;
@@ -45,13 +47,15 @@ public class ProjectService {
     private final ProjectUpdateRepository projectUpdateRepository;
     private final OrderRepository orderRepository;
     private final CurrentUser currentUser;
+    private final NotificationService notifications;
 
     public ProjectService(ProjectRepository projectRepository, ProjectUpdateRepository projectUpdateRepository,
-                          OrderRepository orderRepository, CurrentUser currentUser) {
+                          OrderRepository orderRepository, CurrentUser currentUser, NotificationService notifications) {
         this.projectRepository = projectRepository;
         this.projectUpdateRepository = projectUpdateRepository;
         this.orderRepository = orderRepository;
         this.currentUser = currentUser;
+        this.notifications = notifications;
     }
 
     @Transactional
@@ -90,12 +94,15 @@ public class ProjectService {
     @Transactional
     public ProjectResponse updateStatus(UUID id, ProjectStatusUpdateRequest request, Authentication authentication) {
         currentUser.requireRole(authentication, Role.CARPENTER);
-        Project project = find(id);
+        Project project = projectRepository.findLockedById(id).orElseThrow(() -> new ResourceNotFoundException("Project was not found."));
+        if (project.getStatus() == request.status()) return ProjectResponse.from(project);
         validateStatusChange(project, request);
         LocalDate today = LocalDate.now();
         ProjectStatus nextStatus = request.status();
         project.changeStatus(nextStatus, progressFor(nextStatus), actualStartDateFor(project, nextStatus, today),
                 nextStatus == ProjectStatus.COMPLETED ? today : project.getActualCompletionDate());
+        notifications.notifyUser(project.getCustomer().getUser(), NotificationType.PROJECT, "Project progress updated",
+                project.getProjectNumber() + ": " + nextStatus.name().replace('_', ' '), "/customer/projects?projectId=" + project.getId());
         return ProjectResponse.from(project);
     }
 
@@ -105,6 +112,8 @@ public class ProjectService {
         Project project = find(id);
         User user = currentUser.require(authentication);
         ProjectUpdate update = projectUpdateRepository.save(new ProjectUpdate(project, user, trim(request.title()), trim(request.message())));
+        notifications.notifyUser(project.getCustomer().getUser(), NotificationType.PROJECT, "New project update",
+                trim(request.title()), "/customer/projects?projectId=" + project.getId());
         return ProjectTimelineResponse.from(update);
     }
 
@@ -129,14 +138,14 @@ public class ProjectService {
     }
 
     private void validateStatusChange(Project project, ProjectStatusUpdateRequest request) {
-        if (project.getStatus() == request.status()) {
-            return;
-        }
+        if (project.getStatus() == request.status()) return;
         if (!ALLOWED_TRANSITIONS.getOrDefault(project.getStatus(), Set.of()).contains(request.status())) {
             throw new UnauthorisedOperationException("Invalid project status transition.");
         }
+        if (request.status() == ProjectStatus.COMPLETED && project.getCompletionReviewStatus() != CompletionReviewStatus.CONFIRMED) {
+            throw new IllegalArgumentException("Request customer completion review before completing this project.");
+        }
     }
-
     private int progressFor(ProjectStatus status) {
         return switch (status) {
             case CREATED -> 0;
