@@ -31,6 +31,29 @@ class PostgresIntegrationTest {
     }
 
     @Autowired UserRepository users;
+    @Autowired org.springframework.session.jdbc.JdbcIndexedSessionRepository sessions;
+    @Autowired org.springframework.jdbc.core.JdbcTemplate jdbc;
+
+    @Test
+    void loginContextIsPersistedInPostgresAndRemovedOnLogout() {
+        var session = sessions.createSession();
+        var context = org.springframework.security.core.context.SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated(
+                org.springframework.security.core.userdetails.User.withUsername("session@test.example")
+                        .password("hash").roles("CUSTOMER").build(), null, java.util.List.of()));
+        session.setAttribute(org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+        sessions.save(session);
+        try {
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM SPRING_SESSION WHERE SESSION_ID = ?", Integer.class, session.getId())).isEqualTo(1);
+            var restored = sessions.findById(session.getId());
+            org.springframework.security.core.context.SecurityContext restoredContext = restored.getAttribute(
+                    org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+            assertThat(restoredContext.getAuthentication().getName()).isEqualTo("session@test.example");
+        } finally {
+            sessions.deleteById(session.getId());
+        }
+        assertThat(sessions.findById(session.getId())).isNull();
+    }
     @Autowired jakarta.persistence.EntityManager entities;
     @Autowired com.carpenter.business.project.ProjectCollaborationService collaboration;
 
@@ -78,4 +101,3 @@ class PostgresIntegrationTest {
         assertThat(users.findByEmailIgnoreCase("INTEGRATION@example.com")).isPresent();
     }
 }
-
