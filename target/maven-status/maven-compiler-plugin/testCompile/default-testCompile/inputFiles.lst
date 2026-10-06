@@ -1,9 +1,11 @@
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\appointment\AppointmentServiceTest.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\audit\AuditLogControllerTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\audit\AuditLogServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\auth\AuthenticationControllerTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\auth\AuthenticationServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\auth\EmailSenderConfigurationTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\auth\EmailVerificationServiceTest.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\config\MobileCorsConfigurationTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\customer\CustomerControllerTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\customer\CustomerServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\document\DocumentServiceTest.java
@@ -13,6 +15,7 @@ C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\s
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\order\OrderServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\payment\PaymentServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\portfolio\PortfolioImageServiceTest.java
+C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\project\ProjectCollaborationServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\project\ProjectServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\quotation\QuotationCalculationServiceTest.java
 C:\Users\User\OneDrive\Documents\GitHub\mansyd-interior-design-and-projects-be\src\test\java\com\carpenter\business\quotation\QuotationServiceTest.java

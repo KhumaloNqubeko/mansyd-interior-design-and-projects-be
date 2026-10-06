@@ -4,6 +4,7 @@ import com.carpenter.business.audit.dto.AuditLogResponse;
 import com.carpenter.business.common.PageResponse;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,7 @@ public class AuditLogController {
     PageResponse<AuditLogResponse> all(@RequestParam(required = false) String entityType,
                                        @RequestParam(required = false) UUID entityId,
                                        Authentication authentication,
-                                       @PageableDefault(size = 50) Pageable pageable) {
+                                       @PageableDefault(size = 50, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable) {
         if (entityType != null && entityId != null) {
             return auditLogService.byEntity(entityType, entityId, authentication, pageable);
         }

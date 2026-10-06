@@ -14,6 +14,7 @@ com\carpenter\business\integration\PostgresIntegrationTest.class
 com\carpenter\business\auth\EmailSenderConfigurationTest.class
 com\carpenter\business\servicerequest\ServiceRequestServiceTest.class
 com\carpenter\business\auth\EmailVerificationServiceTest$CapturingEmailSender.class
+com\carpenter\business\audit\AuditLogControllerTest.class
 com\carpenter\business\project\ProjectServiceTest.class
 com\carpenter\business\order\OrderServiceTest.class
 com\carpenter\business\auth\AuthenticationServiceTest.class
